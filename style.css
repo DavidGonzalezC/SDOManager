@@ -16,7 +16,7 @@ body, html {
 }
 
 /* ===================================
-   Contenedor principal
+   Contenedor principal (para páginas distintas al login)
 =================================== */
 .container {
   max-width: 1100px;
@@ -106,13 +106,18 @@ h1, h2 {
    Sección de Login
 =================================== */
 #login-section {
+  /* Ocupa todo el alto de la pantalla */
+  min-height: 100vh; 
+  width: 100%;
+  /* Centra el contenido en ambos ejes */
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100vh;
-  padding: 20px;
+  /* Fondo gris suave */
   background-color: #f4f4f4;
+  margin: 0; /* Asegura que no haya desplazamientos */
+  padding: 20px; 
 }
 
 #login-form {
@@ -121,7 +126,7 @@ h1, h2 {
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   width: 100%;
-  max-width: 700px;
+  max-width: 1000px;
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -284,7 +289,6 @@ h1, h2 {
 /* ===================================
    Contenedor tipo tabla en consulta.html
 =================================== */
-
 .sdo-table-container {
   width: 100%;
   overflow-x: auto; /* Scroll horizontal si la tabla es muy ancha */
@@ -302,17 +306,17 @@ h1, h2 {
 #sdo-table th,
 #sdo-table td {
   border: 1px solid #ddd;
-  padding: 8px 8px;    /* Disminuir padding para compactar */
+  padding: 8px 8px;    
   text-align: left;
   vertical-align: middle;
-  font-size: 12px;      /* Tamaño de fuente moderado */
+  font-size: 12px;      
 }
 
 #sdo-table th {
   background-color: #28a745;
   color: #fff;
   font-weight: bold;
-  white-space: nowrap; /* Evita quiebres de línea en los th */
+  white-space: nowrap; 
 }
 
 #sdo-table tr:nth-child(even) {
@@ -350,7 +354,6 @@ h1, h2 {
 #sdo-table .delete-button:hover {
   background-color: #c82333;
 }
-
 
 /* ===================================
    Modal de Confirmación
@@ -427,6 +430,6 @@ h1, h2 {
     font-size: 13px;
   }
   #search-bar {
-    width: 80%; /* Aumenta el ancho en pantallas pequeñas */
+    width: 80%; 
   }
 }
