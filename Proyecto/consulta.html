@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta de SDOs</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    
+<!-- Botón de menú para abrir el sidebar -->
+<button id="sidebar-toggle">☰</button>
+
+<!-- Sidebar desplegable -->
+<div id="sidebar" class="sidebar">
+  <a href="javascript:void(0)" class="closebtn" id="sidebar-close">&times;</a>
+  <a href="index.html" class="active">Gestión de SDO</a>
+  <a href="consulta.html">Consulta de SDOs</a>
+</div>
+
+
+    <!-- Logos in the Correct Order -->
+    <div class="logo-container">
+        <img src="canacol-energy-logo.png" alt="Canacol Energy">
+        <img src="cneog-logo.png" alt="CNEOG">
+        <img src="cne-oil-gas-logo.png" alt="CNE Oil & Gas">
+        <img src="cantana-logo.png" alt="Cantana">
+    </div>
+
+    <div class="container">
+        <h1>Consulta de SDOs</h1>
+
+        <!-- Search Bar -->
+        <div class="search-container">
+            <input type="text" id="search-bar" placeholder="Buscar por AFE, Contratista...">
+        </div>
+
+        <!-- SDO List -->
+        <div id="sdo-list">
+            <!-- SDO cards will be populated dynamically -->
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

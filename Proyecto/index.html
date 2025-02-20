@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestión de SDO</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<!-- Botón de menú para abrir el sidebar -->
+<button id="sidebar-toggle">☰</button>
+
+<!-- Sidebar desplegable -->
+<div id="sidebar" class="sidebar">
+  <a href="javascript:void(0)" class="closebtn" id="sidebar-close">&times;</a>
+  <a href="index.html" class="active">Gestión de SDO</a>
+  <a href="consulta.html">Consulta de SDOs</a>
+</div>
+
+  <!-- Logos in the Correct Order -->
+  <div class="logo-container">
+      <img src="canacol-energy-logo.png" alt="Canacol Energy">
+      <img src="cneog-logo.png" alt="CNEOG">
+      <img src="cne-oil-gas-logo.png" alt="CNE Oil & Gas">
+      <img src="cantana-logo.png" alt="Cantana">
+  </div>
+
+  <div class="container">
+      <!-- Login Section -->
+      <div id="login-section">
+          <h2>Iniciar Sesión</h2>
+          <form id="login-form">
+              <label for="username">Usuario:</label>
+              <input type="text" id="username" placeholder="Ingrese su usuario" required>
+              <label for="password">Contraseña:</label>
+              <input type="password" id="password" placeholder="Ingrese su contraseña" required>
+              <button type="submit">Iniciar Sesión</button>
+          </form>
+      </div>
+
+      <!-- App Content (Hidden by Default) -->
+      <div id="app-content" style="display: none;">
+          <h1>Gestión de SDO</h1>
+
+          <!-- SDO Registration Form -->
+          <form id="sdo-form">
+              <!-- Reordered fields as per client's request -->
+              <label for="sdo-contratista">Contratista</label>
+              <select id="sdo-contratista" required>
+                  <option value="" disabled selected>Seleccionar Contratista</option>
+                  <option value="NVA">Nueva Alianza</option>
+                  <option value="CGT">CGT</option>
+                  <option value="GMS">Grupo Minero Sucre</option>
+                  <option value="JMV">JEMV</option>
+                  <option value="TOB">TOB</option>
+                  <option value="AJV">AJV</option>
+                  <option value="CRI">CR Ingenería y Consultoría SAS</option>
+                  <option value="TCW">Tecni Welding SAS</option>
+              </select>
+              <span class="error-message" id="contratista-error"></span>
+
+              <label for="sdo-operadora">Operadora</label>
+              <select id="sdo-operadora" required>
+                  <option value="" disabled selected>Seleccionar Operadora</option>
+                  <option value="CNE Oil & Gas">CNE Oil & Gas</option>
+                  <option value="CNEOG">CNEOG</option>
+                  <option value="Cantana">Cantana</option>
+              </select>
+
+              <label for="sdo-contrato">Número del contrato</label>
+              <input type="text" id="sdo-contrato" placeholder="Ingrese el número del contrato" required>
+              <span class="error-message" id="contrato-error"></span>
+
+              <label for="sdo-objeto">Objeto</label>
+              <input type="text" id="sdo-objeto" placeholder="Ingrese el objeto" required>
+              <span class="error-message" id="objeto-error"></span>
+
+              <label for="sdo-afe">AFE</label>
+              <input type="text" id="sdo-afe" placeholder="Ingrese el AFE" required>
+              <span class="error-message" id="afe-error"></span>
+
+              <label for="sdo-cc">Cuenta Contable</label>
+              <input type="text" id="sdo-cc" placeholder="Ingrese la cuenta contable" required>
+
+              <label for="sdo-valor">Valor</label>
+              <input type="number" id="sdo-valor" placeholder="Ingrese el valor" required min="0">
+
+              <label for="sdo-fecha">Fecha de envío</label>
+              <input type="date" id="sdo-fecha" required>
+
+              <button type="submit">Añadir SDO</button>
+          </form>
+
+          <!-- SDO List (Only the last generated SDO) -->
+          <h2>Último SDO Creado</h2>
+          <div id="sdo-list"></div>
+
+          <!-- Copy SDO Button -->
+          <button id="copy-sdo-button" style="display: none;">Copiar SDO</button>
+      </div>
+
+      <!-- Logout Button -->
+      <button id="logout-button" style="display: none;">Cerrar Sesión</button>
+  </div>
+
+<!-- Modal de Confirmación -->
+<div id="confirmation-modal" class="modal">
+    <div class="modal-content">
+      <p>¿Confirmar creación de SDO?</p>
+      <div class="modal-actions">
+        <button id="confirm-create-sdo">Confirmar</button>
+        <button id="cancel-create-sdo">Cancelar</button>
+      </div>
+    </div>
+  </div>
+  
+
+  <script src="script.js"></script>
+</body>
+</html>
