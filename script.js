@@ -130,12 +130,12 @@ function checkLoginStatus() {
 function loadSDOs() {
   sdoList = JSON.parse(localStorage.getItem("sdoList")) || [];
   if (sdoList.length > 0) {
-    // Muestra el último SDO creado
+    // Muestra el último SDO creado en la vista de tarjeta
     agregarSDOLista(sdoList[sdoList.length - 1]);
   }
-  // La variable "consecutivo" ya no se usa para la numeración global
 }
 
+// Al enviar el formulario de SDO (index.html)
 function handleSDOFormSubmission() {
   hideError("contratista");
   hideError("contrato");
@@ -174,7 +174,7 @@ if (confirmCreateSdoButton) {
       sdoList.push(sdoData);
       alert("SDO creado exitosamente.");
     }
-    // En index.html se muestra la última entrada en formato tarjeta (se conserva)
+    // Se actualiza la vista de tarjeta en index.html
     agregarSDOLista(sdoList[sdoList.length - 1]);
     saveToLocalStorage();
     document.getElementById("copy-sdo-button").style.display = "block";
@@ -208,7 +208,7 @@ function validateForm() {
   return isValid;
 }
 
-// Calcular consecutivo individual por contratista y crear objeto SDO
+// Cálculo de consecutivo individual por contratista y creación del objeto SDO
 function createSDOObject() {
   const contratista = document.getElementById("sdo-contratista").value.trim();
   const contractorSDOs = sdoList.filter(s => s.contratista === contratista);
@@ -227,7 +227,7 @@ function createSDOObject() {
   };
 }
 
-// Función para agregar SDO a la vista de index.html (vista en tarjeta)
+// Función para mostrar el último SDO en index.html (vista en tarjeta)
 function agregarSDOLista(sdoData) {
   const sdoListElement = document.getElementById("sdo-list");
   sdoListElement.innerHTML = "";
@@ -296,7 +296,7 @@ if (window.location.pathname.includes("consulta.html")) {
       sdoListElement.innerHTML = "<p>No hay SDOs registrados.</p>";
       return;
     }
-    // Crear la tabla
+    // Crear la tabla (vista tipo Excel)
     const table = document.createElement("table");
     table.id = "sdo-table";
     
@@ -318,20 +318,19 @@ if (window.location.pathname.includes("consulta.html")) {
     table.appendChild(thead);
     
     const tbody = document.createElement("tbody");
-    data.forEach((sdo) => {
+    data.forEach((sdo, index) => {
       const tr = document.createElement("tr");
       tr.innerHTML = `
         <td>${sdo.consecutivo}</td>
-        <td>${sdo.contratista}</td>
-        <td>${sdo.operadora}</td>
-        <td>${sdo.contrato}</td>
-        <td>${sdo.objeto}</td>
-        <td>${sdo.afe}</td>
-        <td>${sdo.cc}</td>
-        <td>$${sdo.valor.toLocaleString()}</td>
-        <td>${sdo.fecha}</td>
+        <td class="editable" data-index="${index}" data-field="contratista">${sdo.contratista}</td>
+        <td class="editable" data-index="${index}" data-field="operadora">${sdo.operadora}</td>
+        <td class="editable" data-index="${index}" data-field="contrato">${sdo.contrato}</td>
+        <td class="editable" data-index="${index}" data-field="objeto">${sdo.objeto}</td>
+        <td class="editable" data-index="${index}" data-field="afe">${sdo.afe}</td>
+        <td class="editable" data-index="${index}" data-field="cc">${sdo.cc}</td>
+        <td class="editable" data-index="${index}" data-field="valor">$${sdo.valor.toLocaleString()}</td>
+        <td class="editable" data-index="${index}" data-field="fecha">${sdo.fecha}</td>
         <td>
-          <button class="edit-button" data-id="${sdo.consecutivo}">Editar</button>
           <button class="delete-button" data-id="${sdo.consecutivo}">Eliminar</button>
         </td>
       `;
@@ -340,9 +339,51 @@ if (window.location.pathname.includes("consulta.html")) {
     table.appendChild(tbody);
     sdoListElement.appendChild(table);
     
-    document.querySelectorAll(".edit-button").forEach(button => {
-      button.addEventListener("click", () => editSDO(button.dataset.id));
+    // Agregar eventos de edición en línea a todas las celdas editables
+    document.querySelectorAll("td.editable").forEach(cell => {
+      cell.addEventListener("dblclick", function() {
+        const field = this.getAttribute("data-field");
+        const index = this.getAttribute("data-index");
+        let currentText = this.innerText;
+        // Si el campo es "valor", quitar símbolo "$" y comas
+        if (field === "valor") {
+          currentText = currentText.replace("$", "").replace(/,/g, "");
+        }
+        const input = document.createElement("input");
+        input.type = "text";
+        input.value = currentText;
+        input.style.width = "100%";
+        this.innerHTML = "";
+        this.appendChild(input);
+        input.focus();
+        
+        const saveEdit = () => {
+          let newValue = input.value.trim();
+          if (newValue === "") {
+            this.innerText = currentText;
+            return;
+          }
+          if (field === "valor") {
+            newValue = parseFloat(newValue) || 0;
+            this.innerText = `$${newValue.toLocaleString()}`;
+          } else {
+            this.innerText = newValue;
+          }
+          // Actualizar el registro en sdoList y guardar en localStorage
+          sdoList[index][field] = newValue;
+          saveToLocalStorage();
+        };
+        
+        input.addEventListener("blur", saveEdit);
+        input.addEventListener("keydown", function(e) {
+          if (e.key === "Enter") {
+            saveEdit();
+          }
+        });
+      });
     });
+    
+    // Agregar evento para el botón de eliminar
     document.querySelectorAll(".delete-button").forEach(button => {
       button.addEventListener("click", () => deleteSDO(button.dataset.id));
     });
@@ -363,14 +404,6 @@ if (window.location.pathname.includes("consulta.html")) {
   }
 
   populateSDOList(sdoListConsulta);
-
-  function editSDO(consecutivo) {
-    const sdoIndex = sdoListConsulta.findIndex(sdo => sdo.consecutivo === consecutivo);
-    if (sdoIndex !== -1) {
-      localStorage.setItem("editIndex", sdoIndex);
-      window.location.href = "index.html"; // Redirige al formulario
-    }
-  }
 
   function deleteSDO(consecutivo) {
     if (confirm("¿Estás seguro de eliminar este SDO?")) {
