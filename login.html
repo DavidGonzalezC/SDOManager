@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Login - Gestión de SDO</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <!-- Logos -->
+    <div class="logo-container">
+        <img src="canacol-energy-logo.png" alt="Canacol Energy" />
+        <img src="cneog-logo.png" alt="CNEOG" />
+        <img src="cne-oil-gas-logo.png" alt="CNE Oil & Gas" />
+        <img src="cantana-logo.png" alt="Cantana" />
+      </div>
+  <!-- Sección de Login (toda la pantalla, centrado) -->
+  <div id="login-section">
+    <h2>Iniciar Sesión</h2>
+    <form id="login-form">
+      <label for="username">Usuario:</label>
+      <input type="text" id="username" placeholder="Ingrese su usuario" required />
+
+      <label for="password">Contraseña:</label>
+      <input type="password" id="password" placeholder="Ingrese su contraseña" required />
+
+      <button type="submit">Iniciar Sesión</button>
+    </form>
+  </div>
+
+  <script>
+    // Ejemplo simple de validación de login
+    document.getElementById("login-form").addEventListener("submit", function(event) {
+      event.preventDefault();
+
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value.trim();
+
+      // Supongamos un caso simple: admin/admin123
+      if (username === "admin" && password === "admin123") {
+        // Guardamos en localStorage que el usuario está logueado
+        localStorage.setItem("loggedIn", "true");
+        // Redirigimos a index.html
+        window.location.href = "index.html";
+      } else {
+        alert("Usuario o contraseña incorrectos.");
+      }
+    });
+  </script>
+</body>
+</html>

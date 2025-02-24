@@ -21,12 +21,23 @@ if (logoutButton) {
     handleLogout();
   });
 }
+document.addEventListener("DOMContentLoaded", function () {
+  // Revisar si el usuario está logueado
+  if (localStorage.getItem("loggedIn") === "true") {
+    // Muestra la app
+    document.getElementById("app-content").style.display = "block";
+    document.getElementById("logout-button").style.display = "block";
+  } else {
+    // Si no está logueado, redirige a login.html
+    window.location.href = "login.html";
+  }
+});
 
 // Carga inicial: verifica login, carga SDOs y precarga datos para edición (solo en index.html)
 document.addEventListener("DOMContentLoaded", function () {
   checkLoginStatus();
   loadSDOs();
-  
+
   // Precargar formulario en caso de edición
   if (document.getElementById("sdo-form")) {
     const editIndexStr = localStorage.getItem("editIndex");
@@ -92,6 +103,24 @@ if (sdoContratoInput) {
 
 /* ==================== Helper Functions ==================== */
 
+// Toast Notifications
+function showToast(message, duration = 3000) {
+  let container = document.getElementById("toast-container");
+  if (!container) {
+    container = document.createElement("div");
+    container.id = "toast-container";
+    document.body.appendChild(container);
+  }
+  const toast = document.createElement("div");
+  toast.className = "toast";
+  toast.innerText = message;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.classList.add("hide");
+    setTimeout(() => toast.remove(), 500);
+  }, duration);
+}
+
 // Login & Logout
 function handleLogin() {
   const username = document.getElementById("username").value.trim();
@@ -102,17 +131,18 @@ function handleLogin() {
     document.getElementById("login-section").style.display = "none";
     document.getElementById("app-content").style.display = "block";
     document.getElementById("logout-button").style.display = "block";
+    showToast("Inicio de sesión exitoso");
   } else {
-    alert("Usuario o contraseña incorrectos.");
+    showToast("Usuario o contraseña incorrectos");
   }
 }
 
 function handleLogout() {
   localStorage.removeItem("loggedIn");
-  document.getElementById("login-section").style.display = "block";
-  document.getElementById("app-content").style.display = "none";
-  document.getElementById("logout-button").style.display = "none";
+  // Redirige al login
+  window.location.href = "login.html";
 }
+
 
 function checkLoginStatus() {
   if (localStorage.getItem("loggedIn") === "true") {
@@ -166,15 +196,15 @@ if (confirmCreateSdoButton) {
       const editIndex = parseInt(editIndexStr);
       const updatedData = createSDOObject();
       sdoList[editIndex] = updatedData;
-      alert("SDO actualizado exitosamente.");
+      showToast("SDO actualizado exitosamente.");
       localStorage.removeItem("editIndex");
     } else {
       // Modo creación: añade nuevo SDO
       const sdoData = createSDOObject();
       sdoList.push(sdoData);
-      alert("SDO creado exitosamente.");
+      showToast("SDO creado exitosamente.");
     }
-    // Se actualiza la vista de tarjeta en index.html
+    // Actualiza la vista de tarjeta en index.html
     agregarSDOLista(sdoList[sdoList.length - 1]);
     saveToLocalStorage();
     document.getElementById("copy-sdo-button").style.display = "block";
@@ -186,7 +216,7 @@ const cancelCreateSdoButton = document.getElementById("cancel-create-sdo");
 if (cancelCreateSdoButton) {
   cancelCreateSdoButton.addEventListener("click", function () {
     hideConfirmationModal();
-    alert("Creación de SDO cancelada.");
+    showToast("Creación de SDO cancelada.");
   });
 }
 
@@ -271,8 +301,8 @@ function copySDOText() {
   if (sdoCard) {
     const sdoText = sdoCard.textContent;
     navigator.clipboard.writeText(sdoText)
-      .then(() => alert("SDO copiado al portapapeles."))
-      .catch(() => alert("Error al copiar el SDO."));
+      .then(() => showToast("SDO copiado al portapapeles."))
+      .catch(() => showToast("Error al copiar el SDO."));
   }
 }
 
@@ -339,13 +369,19 @@ if (window.location.pathname.includes("consulta.html")) {
     table.appendChild(tbody);
     sdoListElement.appendChild(table);
     
-    // Agregar eventos de edición en línea a todas las celdas editables
+    // Animación de fade-in para la tabla
+    table.style.opacity = 0;
+    setTimeout(() => {
+      table.style.transition = "opacity 0.5s ease";
+      table.style.opacity = 1;
+    }, 50);
+    
+    // Edición en línea en todas las celdas editables
     document.querySelectorAll("td.editable").forEach(cell => {
       cell.addEventListener("dblclick", function() {
         const field = this.getAttribute("data-field");
         const index = this.getAttribute("data-index");
         let currentText = this.innerText;
-        // Si el campo es "valor", quitar símbolo "$" y comas
         if (field === "valor") {
           currentText = currentText.replace("$", "").replace(/,/g, "");
         }
@@ -369,9 +405,9 @@ if (window.location.pathname.includes("consulta.html")) {
           } else {
             this.innerText = newValue;
           }
-          // Actualizar el registro en sdoList y guardar en localStorage
           sdoList[index][field] = newValue;
           saveToLocalStorage();
+          showToast("Registro actualizado");
         };
         
         input.addEventListener("blur", saveEdit);
@@ -383,28 +419,36 @@ if (window.location.pathname.includes("consulta.html")) {
       });
     });
     
-    // Agregar evento para el botón de eliminar
+    // Botón de eliminar
     document.querySelectorAll(".delete-button").forEach(button => {
       button.addEventListener("click", () => deleteSDO(button.dataset.id));
     });
   }
-
+  
+  // Filtrado: busca en todas las categorías
   const searchBar = document.getElementById("search-bar");
   if (searchBar) {
     searchBar.addEventListener("input", function (e) {
       const searchTerm = e.target.value.toLowerCase();
       const filteredData = sdoListConsulta.filter(sdo => {
         return (
+          sdo.consecutivo.toLowerCase().includes(searchTerm) ||
           sdo.contratista.toLowerCase().includes(searchTerm) ||
-          sdo.afe.toLowerCase().includes(searchTerm)
+          sdo.operadora.toLowerCase().includes(searchTerm) ||
+          sdo.contrato.toLowerCase().includes(searchTerm) ||
+          sdo.objeto.toLowerCase().includes(searchTerm) ||
+          sdo.afe.toLowerCase().includes(searchTerm) ||
+          sdo.cc.toLowerCase().includes(searchTerm) ||
+          sdo.fecha.toLowerCase().includes(searchTerm) ||
+          sdo.valor.toString().toLowerCase().includes(searchTerm)
         );
       });
       populateSDOList(filteredData);
     });
   }
-
+  
   populateSDOList(sdoListConsulta);
-
+  
   function deleteSDO(consecutivo) {
     if (confirm("¿Estás seguro de eliminar este SDO?")) {
       const sdoIndex = sdoListConsulta.findIndex(sdo => sdo.consecutivo === consecutivo);
@@ -412,6 +456,7 @@ if (window.location.pathname.includes("consulta.html")) {
         sdoListConsulta.splice(sdoIndex, 1);
         localStorage.setItem("sdoList", JSON.stringify(sdoListConsulta));
         populateSDOList(sdoListConsulta);
+        showToast("SDO eliminado");
       }
     }
   }
@@ -422,7 +467,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const sidebarToggle = document.getElementById("sidebar-toggle");
   const sidebar = document.getElementById("sidebar");
   const sidebarClose = document.getElementById("sidebar-close");
-
+  
   if (sidebarToggle) {
     sidebarToggle.addEventListener("click", openSidebar);
   }
